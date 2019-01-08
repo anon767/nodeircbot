@@ -1,0 +1,39 @@
+{
+  "name": "nodeircbot",
+  "version": "1.0.2",
+  "author": {
+    "name": "anon767",
+    "url": "https://github.com/anon767"
+  },
+  "license": "MIT",
+  "repository": "git://github.com/anon767/nodeircbot",
+  "bugs": "https://github.com/anon767e/nodeircbot/issues",
+  "description": "A simple C ircbot with nodejs bindings",
+  "main": "index.js",
+  "engines": {
+    "node": "9.x.x"
+  },
+  "dependencies": {},
+  "devDependencies": {
+	"hackernews-api": "*"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "addon",
+    "irc",
+    "bot",
+    "cpp",
+    "c",
+    "c++",
+    "native",
+    "fast",
+    "ircbot",
+    "object",
+    "extensible",
+    "javascript",
+    "nodejs",
+    "node"
+  ]
+}
