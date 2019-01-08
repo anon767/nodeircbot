@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-void binding_sendStuff(char* message);
+void binding_sendStuff(char* nick, char* message);
 int irc_connect(irc_t *irc, const char* server, const char* port)
 {
    if ( (irc->s =  get_socket(server, port)) < 0 )
@@ -146,7 +146,7 @@ int irc_parse_action(irc_t *irc)
          
          if ( privmsg == 1 && strlen(irc_nick) > 0 && strlen(irc_msg) > 0 )
          {
-   	    binding_sendStuff(irc_msg);
+   	    binding_sendStuff(irc_nick,irc_msg);
 
             //irc_log_message(irc, irc_nick, irc_msg);
             if ( irc_reply_message(irc, irc_nick, irc_msg) < 0 )

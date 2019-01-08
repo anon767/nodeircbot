@@ -30,14 +30,14 @@ struct async_req {
     v8::Persistent <v8::Function> callback;
     node::async_context context;
 };
-void binding_sendStuff( char* msg){
+void binding_sendStuff(char* nick, char* msg){
         v8::Isolate* isolate = v8::Isolate::GetCurrent();
         v8::Local<v8::Function> func = v8::Local<v8::Function>::New(isolate, r_call);
        if (!func.IsEmpty()) {
-            const unsigned argc = 1;
-            v8::Local<v8::Value> argv[argc] =
-                { v8::String::NewFromUtf8(isolate, msg) };
-            func->Call(v8::Null(isolate), argc, argv);
+            v8::Local<v8::Value> argv[2];
+           argv[1] = v8::String::NewFromUtf8(isolate, msg) ;
+           argv[0] = v8::String::NewFromUtf8(isolate, nick);
+	   func->Call(v8::Null(isolate), 2, argv);
     }
 }
 void DoAsync(uv_work_t *r) {

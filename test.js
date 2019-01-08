@@ -4,9 +4,9 @@ var ircbot = require('./build/Release/ircbot');
 
 ircbot.start("irc.thecout.com","#juice","6667","chillibot_",
 	
-	function(msg){
+	function(nick, msg){
 		if(msg=="test")
-			ircbot.send("yay es läuft");
+			ircbot.send(nick + ":yay es läuft");
 	}
 
 );
