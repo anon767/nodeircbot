@@ -1,0 +1,91 @@
+#include <node/node.h>
+#include <node/v8.h>
+#include <uv.h>
+#include <string>
+#include <iostream>
+#include <node/node_object_wrap.h>
+#if defined _WIN32
+#include <windows.h>
+#else
+
+#include <unistd.h>
+
+#endif
+#include "bot.h"
+#include "bot.c"
+#include "irc.c"
+#include "socket.c"
+auto isolate = v8::Isolate::GetCurrent();
+
+using namespace v8;
+
+struct async_req {
+    uv_work_t req;
+    std::string server;
+    std::string channel;
+    std::string port;
+    std::string nick;
+    std::string output;
+    v8::Isolate *isolate;
+    v8::Persistent <v8::Function> callback;
+    node::async_context context;
+};
+
+void DoAsync(uv_work_t *r) {
+    async_req *req = reinterpret_cast<async_req *>(r->data);
+    bot_start(req->server.c_str(),req->channel.c_str(),req->port.c_str(),req->nick.c_str(),req->callback);
+}
+
+void AfterAsync(uv_work_t *r, int ignored) {
+    async_req *req = reinterpret_cast<async_req *>(r->data);
+    v8::Isolate *isolate = req->isolate;
+    v8::HandleScope scope(isolate);
+    v8::Local <v8::Value> argv[1] = {
+            String::NewFromUtf8(isolate, req->output.c_str())
+    };
+    v8::TryCatch try_catch(isolate);
+    v8::Local <v8::Object> global = isolate->GetCurrentContext()->Global();
+    v8::Local <v8::Function> callback =
+            v8::Local<v8::Function>::New(isolate, req->callback);
+    callback->Call(global, 1, argv);
+    node::EmitAsyncDestroy(isolate, req->context);
+    req->callback.Reset();
+    delete req;
+}
+
+void GetAsync(const v8::FunctionCallbackInfo <v8::Value> &args) {
+    v8::Isolate *isolate = args.GetIsolate();
+    async_req *req = new async_req;
+    req->req.data = req;
+    String::Utf8Value server(isolate, args[0]->ToString());
+    const std::string serverString = std::string(*server);
+    String::Utf8Value channel(isolate, args[1]->ToString());
+    const std::string channelString = std::string(*channel);
+    String::Utf8Value port(isolate, args[2]->ToString());
+    const std::string portString = std::string(*port);  
+    String::Utf8Value nick(isolate, args[3]->ToString());
+    const std::string nickString = std::string(*nick);
+    req->server = serverString;
+    req->channel = channelString;
+    req->port = portString;
+    req->nick = nickString;
+    req->isolate = isolate;
+    req->context = node::EmitAsyncInit(isolate, v8::Object::New(isolate), "test");
+    v8::Local <v8::Function> callback = v8::Local<v8::Function>::Cast(args[4]);
+    req->callback.Reset(isolate, callback);
+    uv_queue_work(node::GetCurrentEventLoop(isolate),
+                  &req->req,
+                  DoAsync,
+                  (uv_after_work_cb) AfterAsync);
+}
+
+
+void init(Handle <Object> exports) {
+    //exports->Set(String::NewFromUtf8(isolate, "send"),
+    //             FunctionTemplate::New(isolate, Get)
+    //                     ->GetFunction());
+    NODE_SET_METHOD(exports, "start", GetAsync);
+}
+
+NODE_MODULE(NODE_GYP_MODULE_NAME, init
+)
