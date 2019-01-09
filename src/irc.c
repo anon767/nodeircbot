@@ -78,8 +78,7 @@ int irc_handle_data(irc_t *irc)
 int irc_parse_action(irc_t *irc)
 {
    
-   char irc_nick[128];
-   char irc_msg[512];
+
 
 
    if ( strncmp(irc->servbuf, "PING :", 6) == 0 )
@@ -103,8 +102,8 @@ int irc_parse_action(irc_t *irc)
    {
       char *ptr;
       int privmsg = 0;
-      char irc_nick[128];
-      char irc_msg[512];
+      char* irc_nick = (char*)malloc(sizeof(char)*128);
+      char* irc_msg = (char*)malloc(sizeof(char)*1024);
       *irc_nick = '\0';
       *irc_msg = '\0';
 
@@ -146,7 +145,7 @@ int irc_parse_action(irc_t *irc)
          
          if ( privmsg == 1 && strlen(irc_nick) > 0 && strlen(irc_msg) > 0 )
          {
-   	    binding_sendStuff(irc_nick,irc_msg);
+   	        binding_sendStuff(irc_nick,irc_msg);
 
             //irc_log_message(irc, irc_nick, irc_msg);
             if ( irc_reply_message(irc, irc_nick, irc_msg) < 0 )
@@ -285,6 +284,7 @@ int irc_log_message(irc_t *irc, const char* nick, const char* message)
 
    fprintf(irc->file, "%s - [%s] <%s> %s\n", irc->channel, timestring, nick, message);
    fflush(irc->file);
+   return 1;
 }
 
 void irc_close(irc_t *irc)
