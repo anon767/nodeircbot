@@ -38,7 +38,6 @@ struct payload{
 
 void doactualstuff(uv_async_t* handle) {
      payload* p = (payload*)(handle->data);
-     printf("%s %s\n",p->nick,p->msg);
    Isolate* isolate = Isolate::GetCurrent();
    HandleScope scope(isolate);
 
