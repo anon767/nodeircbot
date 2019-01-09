@@ -1,9 +1,9 @@
-#include <node/node.h>
-#include <node/v8.h>
+#include <node.h>
+#include <v8.h>
 #include <uv.h>
 #include <string>
 #include <iostream>
-#include <node/node_object_wrap.h>
+#include <node_object_wrap.h>
 #if defined _WIN32
 #include <windows.h>
 #else
