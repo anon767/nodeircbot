@@ -113,7 +113,7 @@ int irc_parse_action(irc_t *irc)
    
       if ( irc->servbuf[0] == ':' )
       {
-         ptr = strtok(irc->servbuf, "!");
+         ptr = strtok(irc->servbuf, "?");
          if ( ptr == NULL )
          {
             printf("ptr == NULL\n");
